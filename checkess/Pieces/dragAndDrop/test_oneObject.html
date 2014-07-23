@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Canvas Drag and Drop Test</title>
+</head>
+<body>
+<section>
+
+<div>
+<canvas id="canvas" width="800" height="600">
+This text is displayed if your browser does not support HTML5 Canvas.
+</canvas>
+</div>
+
+<script type="text/javascript">
+
+
+
+var canvas;
+var imageObj;
+var pic;
+var ctx;
+var WIDTH = 800;
+var HEIGHT = 600;
+
+function rect(x,y,w,h) {
+ ctx.beginPath();
+ ctx.rect(x,y,w,h);
+ ctx.closePath();
+ ctx.fill();
+}
+
+//CREATE AN IMAGE OBJECT
+function ImageObj(pic, x, y, width, height, dragOk) {
+  //THESE ARE THE OBJECT'S ATTRIBUTES
+  this.pic = pic;
+  this.y = y;
+  this.x = x;
+  this.height = height;
+  this.width = width;
+  this.dragOk = dragOk;
+}
+
+function clear() {
+ ctx.clearRect(0, 0, WIDTH, HEIGHT);
+}
+
+function init() {
+ canvas = document.getElementById("canvas");
+ ctx = canvas.getContext("2d");
+ pic = new Image();
+ pic.src = 'images/one.jpeg';
+ imageObj = new ImageObj(pic, 50, 50, 100, 100, false);
+ return setInterval(draw, 10);
+}
+
+function draw() {
+ clear();
+ ctx.fillStyle = "black";
+ rect(0,0,WIDTH,HEIGHT);
+ ctx.drawImage(imageObj.pic, imageObj.x-imageObj.width/2, imageObj.y-imageObj.height/2);
+}
+
+function myMove(e){
+ if (imageObj.dragOk){
+  imageObj.x = e.pageX - canvas.offsetLeft;
+  imageObj.y = e.pageY - canvas.offsetTop;
+ }
+}
+
+function myDown(e){
+ if (e.pageX < imageObj.x + imageObj.width/2 + canvas.offsetLeft && e.pageX > imageObj.x - imageObj.width/2 +
+ canvas.offsetLeft && e.pageY < imageObj.y + imageObj.height/2 + canvas.offsetTop &&
+ e.pageY > imageObj.y - imageObj.height/2 + canvas.offsetTop){
+  imageObj.x = e.pageX - canvas.offsetLeft;
+  imageObj.y = e.pageY - canvas.offsetTop;
+  imageObj.dragOk = true;
+  canvas.onmousemove = myMove;
+ }
+}
+
+function myUp(){
+ imageObj.dragOk = false;
+ canvas.onmousemove = null;
+}
+
+init();
+canvas.onmousedown = myDown;
+canvas.onmouseup = myUp;
+
+
+
+</script>
+
+</section>
+</body>
+</html>

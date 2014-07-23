@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Canvas Drag and Drop Test</title>
+</head>
+<body>
+<section>
+
+<div>
+<canvas id="canvas" width="800" height="600">
+This text is displayed if your browser does not support HTML5 Canvas.
+</canvas>
+</div>
+
+<script type="text/javascript">
+
+
+// GLOBAL VARIABLES CAN BE ACCESSED BY ANY FUNCTION
+var canvas;
+var imageObj;
+var ctx;
+var x = 50;
+var y = 50;
+var iWidth = 100;
+var iHeight = 100;
+var WIDTH = 800;
+var HEIGHT = 600;
+var dragok = false;
+
+// FUNCTION DRAWS RECTANGLE
+function rect(x,y,w,h) {
+ ctx.beginPath();
+ ctx.rect(x,y,w,h);
+ ctx.closePath();
+ ctx.fill();
+}
+
+//FUNCTION CLEARS RECTANGLE
+function clear() {
+ ctx.clearRect(0, 0, WIDTH, HEIGHT);
+}
+
+//FUNCTION CALLED FIRST, INITIALIZES EVERYTHING
+function init() {
+ //GET THE CANVAS INTO THE CANVAS VARIABLE SO WE CAN USE IT
+ canvas = document.getElementById("canvas");
+ //GET THE CONTEXT IN THE CTX VARIABLE SO WE CAN USE IT
+ ctx = canvas.getContext("2d");
+ //CREATE AN IMAGE OBJECT
+ imageObj = new Image();
+ //SET THE IMAGE OBJECT'S SOURCE
+ imageObj.src = 'images/one.jpeg';
+ //CALL THE DRAW FUNCTION AT A REGULAR INTERVAL
+ return setInterval(draw, 10);
+}
+
+//THIS FUNCTION GETS CALLED EVERY FRAME
+function draw() {
+ //CLEAR THE FRAME
+ clear();
+ //DRAW BACKGROUND RECTANGLE BLACK
+ ctx.fillStyle = "black";
+ rect(0,0,WIDTH,HEIGHT);
+ //DRAW IMAGE
+ ctx.drawImage(imageObj, x-50, y-50);
+}
+
+//MYDOWN SETS CANVAS.ONMOUSEMOVE TO THIS FUNCTION
+function myMove(e){
+ //CHECK TO SEE IF DRAG IS OK IF IT IS SET X AND Y TO CURRENT MOUSE POSITION
+ if (dragok){
+  x = e.pageX - canvas.offsetLeft;
+  y = e.pageY - canvas.offsetTop;
+ }
+}
+
+//SET TO ONMOUSEDOWN
+function myDown(e){
+ //CHECK TO SEE IF POINT IS INSIDE IMAGE
+ if (e.pageX < x + iWidth/2 + canvas.offsetLeft && e.pageX > x - iWidth/2 +
+ canvas.offsetLeft && e.pageY < y + iHeight/2 + canvas.offsetTop &&
+ e.pageY > y - iHeight/2 + canvas.offsetTop){
+  //SET X AND Y TO MOUSE POSITION 
+  x = e.pageX - canvas.offsetLeft;
+  y = e.pageY - canvas.offsetTop;
+  //SET VARIABLE SAYING WE CAN DRAG
+  dragok = true;
+  //SET CANVAS' ONMOUSEMOVE TO MYMOVE FUNCTION
+  canvas.onmousemove = myMove;
+ }
+}
+
+//SET TO ONMOUSEUP
+function myUp(){
+ //SET VARIABLE SAYING WE CAN NO LONGER DRAG
+ dragok = false;
+ //SET CANVAS' ONMOUSEMOVE TO NOTHING SO MYMOVE WILL NO LONGER BE CALLED
+ canvas.onmousemove = null;
+}
+
+init();
+canvas.onmousedown = myDown;
+canvas.onmouseup = myUp;
+
+
+
+</script>
+
+</section>
+</body>
+</html>

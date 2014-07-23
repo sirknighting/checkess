@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Canvas Drag and Drop Test</title>
+</head>
+<body>
+<section>
+
+<div>
+<p id="info"> position will be displayed here </p>
+<canvas id="canvas" width="800" height="600">
+This text is displayed if your browser does not support HTML5 Canvas.
+</canvas>
+</div>
+
+<script type="text/javascript">
+
+
+
+var canvas;
+var imageObj;
+var imageSources;
+var ctx;
+var WIDTH = 800;
+var HEIGHT = 600;
+var fillColor = "indigo";
+var info;
+var mousePrevX;
+var mousePrevY;
+
+function rect(x,y,w,h) {
+ ctx.beginPath();
+ ctx.rect(x,y,w,h);
+ ctx.closePath();
+ ctx.fill();
+}
+
+function ImageObj(pic, x, y, width, height, dragOk) {
+  this.pic = pic;
+  this.y = y;
+  this.x = x;
+  this.height = height;
+  this.width = width;
+  this.dragOk = dragOk;
+  this.insideClick = function(e, canvas, info){
+    info.innerHTML = this.x + " " + this.y + " " + e.pageX + " " +e.pageY;
+  	if (e.pageX < this.x + this.width/2 + canvas.offsetLeft && e.pageX > this.x - this.width/2 +
+ 		canvas.offsetLeft && e.pageY < this.y + this.height/2 + canvas.offsetTop &&
+ 		e.pageY > this.y - this.height/2 + canvas.offsetTop){
+ 		return true;
+ 	}
+ 	return false;
+  };
+}
+
+function clear() {
+ ctx.clearRect(0, 0, WIDTH, HEIGHT);
+}
+
+function init() {
+ canvas = document.getElementById("canvas");
+ info = document.getElementById("info");
+ ctx = canvas.getContext("2d");
+ imageObj = [];
+ imageSources = ["one.jpeg","two.jpeg","three.jpeg","four.jpeg","five.jpeg"];
+ for(var i = 0; i < imageSources.length; i++){
+ 	pic = new Image();
+ 	pic.src = "images/" + imageSources[i];
+ 	imageObj.push(new ImageObj(pic, 50+i*110, 50+i*110, 100, 100, false));
+ }
+ return setInterval(draw, 10);
+}
+
+function draw() {
+ clear();
+ ctx.fillStyle = fillColor;
+ rect(0,0,WIDTH,HEIGHT);
+ for(var i = imageSources.length -1; i >= 0; i--){
+   ctx.drawImage(imageObj[i].pic, imageObj[i].x-imageObj[i].width/2, imageObj[i].y-imageObj[i].height/2);
+ }
+}
+
+function myMove(e){
+ for(var i = 0; i < imageSources.length; i++){
+  if (imageObj[i].dragOk){
+   info.innerHTML = imageObj[i].x + " " + imageObj[i].y + " " + e.pageX + " " +e.pageY;
+   imageObj[i].x = imageObj[i].x - (mousePrevX - e.pageX);
+   imageObj[i].y = imageObj[i].y - (mousePrevY - e.pageY);
+   mousePrevX = e.pageX;
+   mousePrevY = e.pageY;
+  }
+ }
+}
+
+function myDown(e){
+for(var i = 0; i < imageSources.length; i++){
+  if (imageObj[i].insideClick(e, canvas, info)){
+   mousePrevX = e.pageX;
+   mousePrevY = e.pageY;
+   imageObj[i].dragOk = true;
+   canvas.onmousemove = myMove;
+  }
+ }
+}
+
+function myUp(){
+ for(var i = 0; i < imageSources.length; i++){
+  imageObj[i].dragOk = false;
+ }
+ canvas.onmousemove = null;
+}
+
+init();
+canvas.onmousedown = myDown;
+canvas.onmouseup = myUp;
+
+
+
+</script>
+
+</section>
+</body>
+</html>
